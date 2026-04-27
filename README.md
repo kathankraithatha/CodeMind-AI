@@ -60,13 +60,13 @@ Unlike basic AI wrappers, this project:
 ## 📸 Screenshots
 
 ### 🔹 Landing Image
-![Analysis Screenshot](./CodeMindScreenShot/CodeMind-1.png)
+![Landing Image](./assets/CodeMind-1.png)
 
 ### 🔹 Analysis Mode
-![Agent Mode Screenshot](./assets/CodeMind-2.png)
+![Analysis Mode](./assets/CodeMind-2.png)
 
 ### 🔹 Chat Mode
-![Chat Mode Screenshot](./assets/CodeMind-3.png)
+![Chat Mode](./assets/CodeMind-3.png)
 
 ---
 
