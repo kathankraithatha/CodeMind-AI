@@ -388,3 +388,15 @@ h1, h2, h3, h4 { font-family: 'Syne', sans-serif; letter-spacing: -0.02em; }
 </style>
 """, unsafe_allow_html=True)
 
+
+def codeMindHeader():
+    st.markdown("""
+<div class="hero">
+    <div class="hero-badge">⬡</div>
+    <div>
+        <div class="hero-title">CodeMind AI</div>
+        <div class="hero-sub">Intelligent code analysis · Powered by Gemini</div>
+    </div>
+</div>
+<div class="divider"></div>
+""", unsafe_allow_html=True)

@@ -4,18 +4,14 @@ import time
 from dotenv import load_dotenv
 from google import genai
 import streamlit_css as sc
+import prompt as pr
 
-# ─────────────────────────────────────────
-# 🔐 Config & Init
-# ─────────────────────────────────────────
+# Config & Init
 load_dotenv()
 client = genai.Client(api_key=os.getenv("GOOGLE_API_KEY"))
-gemini_model = "gemini-3-flash-preview"
-models = client.models.list()
-for model in models:
-    print(model.name)
+gemini_model = "gemini-2.5-flash-lite"
 
-
+    
 st.set_page_config(
     page_title="CodeMind AI",
     page_icon="⬡",
@@ -23,26 +19,24 @@ st.set_page_config(
     initial_sidebar_state="collapsed",
 )
 
-# ─────────────────────────────────────────
-# 🎨 Custom CSS — Dark terminal-luxury theme
-# ─────────────────────────────────────────
+# Custom CSS — Dark terminal-luxury theme (streamlit_css.py)
 sc.ai_dev_assistant_css()
 
-# ─────────────────────────────────────────
-# 🧠 LLM Core
-# ─────────────────────────────────────────
+# LLM Core
+
 def call_llm(prompt: str) -> str:
-    """Call Gemini and return text response."""
-    response = client.models.generate_content(
-        model=gemini_model,
-        contents=prompt,
-    )
-    return response.text
+    try:
+        response = client.models.generate_content(
+            model=gemini_model,
+            contents=prompt,
+        )
+        return response.text
+    except Exception as e:
+        return f"⚠️ Error: {str(e)}"
 
 
-# ─────────────────────────────────────────
-# 🤖 Agent Pipeline
-# ─────────────────────────────────────────
+
+# Agent Pipeline
 def run_agent(code: str):
     """3-step agentic improvement loop."""
     steps = []
@@ -50,10 +44,7 @@ def run_agent(code: str):
     # Step 1 — analyze & fix
     st.markdown('<div class="step-badge"><span class="dot"></span>Step 1 · Analyzing & fixing issues</div>', unsafe_allow_html=True)
     improved = call_llm(f"""
-You are a senior software engineer. Analyze the code below, identify all issues (bugs, anti-patterns, security flaws, performance problems) and return a corrected version.
-
-Return ONLY the improved code with brief inline comments where relevant. No prose outside the code block.
-
+{pr.run_agent_prompt}
 ```
 {code}
 ```
@@ -64,10 +55,7 @@ Return ONLY the improved code with brief inline comments where relevant. No pros
     # Step 2 — optimize
     st.markdown('<div class="step-badge"><span class="dot"></span>Step 2 · Optimizing & applying best practices</div>', unsafe_allow_html=True)
     final_code = call_llm(f"""
-You are a senior software engineer performing a code review. Refactor the code below to apply modern best practices, improve readability, reduce complexity, and optimize performance.
-
-Return ONLY the final polished code. No explanations outside the code.
-
+{pr.run_agent_prompt}
 ```
 {improved}
 ```
@@ -78,14 +66,8 @@ Return ONLY the final polished code. No explanations outside the code.
     # Step 3 — explain
     st.markdown('<div class="step-badge"><span class="dot"></span>Step 3 · Generating explanation</div>', unsafe_allow_html=True)
     explanation = call_llm(f"""
-You are a senior engineer writing for a developer audience. Given the final improved code below, write a concise structured explanation covering:
 
-1. **What changed** — key fixes and refactors made
-2. **Why it matters** — performance, security, readability gains
-3. **Best practice applied** — design patterns or principles used
-4. **One insight** — a non-obvious tip about the approach
-
-Keep it sharp and professional.
+{pr.run_agent_improve_code_prompt}
 
 Code:
 ```
@@ -99,9 +81,7 @@ Code:
     
 
 
-# ─────────────────────────────────────────
-# 📦 Prompt Builder
-# ─────────────────────────────────────────
+# Prompt Builder
 def build_prompt(code: str, action: str, level: str) -> str:
     action_map = {
         "Explain Code":  "Explain this code comprehensively",
@@ -116,25 +96,8 @@ Task: {task}
 
 Audience level: {level} developer
 
-Respond using this exact structured format:
 
-### 🔍 Overview
-What this code does — one tight paragraph.
-
-### ⚠️ Issues & Risks
-Bulleted list of bugs, vulnerabilities, code smells, or inefficiencies found. Be specific.
-
-### 🚀 Optimizations
-Concrete improvements with brief reasoning for each.
-
-### 💻 Improved Code
-```
-[full rewritten code here]
-```
-
-### 💡 Key Insight
-One non-obvious lesson from reviewing this code — something that separates junior from senior developers.
-
+{pr.prompt_builder}
 Code to analyze:
 ```
 {code}
@@ -142,24 +105,11 @@ Code to analyze:
 """
 
 
-# ─────────────────────────────────────────
-# 🎯 Hero Header
-# ─────────────────────────────────────────
-st.markdown("""
-<div class="hero">
-    <div class="hero-badge">⬡</div>
-    <div>
-        <div class="hero-title">CodeMind AI</div>
-        <div class="hero-sub">Intelligent code analysis · Powered by Gemini 2.5 Flash</div>
-    </div>
-</div>
-<div class="divider"></div>
-""", unsafe_allow_html=True)
+# Hero Header
+sc.codeMindHeader()
 
 
-# ─────────────────────────────────────────
 # 🔝 Controls Row
-# ─────────────────────────────────────────
 col_a, col_b, col_c, col_d = st.columns([2, 1.4, 1.4, 1.2])
 
 with col_a:
@@ -182,9 +132,7 @@ if agent_mode:
     """, unsafe_allow_html=True)
 
 
-# ─────────────────────────────────────────
-# 🧱 Editor + Output
-# ─────────────────────────────────────────
+# Editor + Output
 col1, col2 = st.columns(2)
 
 with col1:
@@ -199,9 +147,7 @@ with col2:
     output_container = st.container()
 
 
-# ─────────────────────────────────────────
-# 🚀 Run Button
-# ─────────────────────────────────────────
+#  Run Button
 btn_col, hint_col = st.columns([1, 5])
 with btn_col:
     run_clicked = st.button("▶ Run Analysis", use_container_width=True)
@@ -240,9 +186,8 @@ else:
         )
 
 
-# ─────────────────────────────────────────
-# 💬 Chat Section
-# ─────────────────────────────────────────
+# Chat Section
+
 st.markdown('<div class="divider" style="margin-top:2.5rem"></div>', unsafe_allow_html=True)
 st.markdown('<div class="section-label">Context-Aware Chat</div>', unsafe_allow_html=True)
 
@@ -289,10 +234,7 @@ if user_input := st.chat_input("Ask anything about your code — debugging, arch
 {history_text}
 
 ## Instructions
-- Answer the latest user message directly and concisely
-- Use code blocks when showing code
-- Reference the analyzed code above when relevant
-- Be direct — no filler phrases
+Answer the latest user message directly and concisely, Use code blocks when showing code, Reference the analyzed code above when relevant, Be direct — no filler phrases
 """
 
     with st.chat_message("assistant"):
@@ -303,9 +245,7 @@ if user_input := st.chat_input("Ask anything about your code — debugging, arch
     st.session_state["messages"].append({"role": "assistant", "content": reply})
 
 
-# ─────────────────────────────────────────
-# 🧹 Footer Controls
-# ─────────────────────────────────────────
+# Footer Controls
 st.markdown('<div style="margin-top:1rem"></div>', unsafe_allow_html=True)
 footer_col1, footer_col2 = st.columns([1, 8])
 with footer_col1:
