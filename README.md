@@ -117,3 +117,5 @@ If you’d like to collaborate or discuss Developer Relations opportunities, fee
 - LinkedIn: https://linkedin.com/in/kathank  
 - GitHub: https://github.com/kathankraithatha  
 - Email: kathankraithatha@gmail.com  
+
+Leave a Star for CodeMind-AI ⭐
