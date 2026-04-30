@@ -1,0 +1,5 @@
+fastapi>=0.115.0
+uvicorn>=0.34.0
+google-genai>=1.73.1
+python-dotenv>=1.2.2
+streamlit>=1.56.0
