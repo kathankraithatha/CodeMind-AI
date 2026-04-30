@@ -75,21 +75,41 @@ Unlike basic AI wrappers, this project:
 ### 1. Clone the Repository
 
 ```bash
-git clone https://github.com/your-username/CodeMind-AI.git
+git clone https://github.com/kathankraithatha/CodeMind-AI.git
 cd CodeMind-AI
 ```
-### 2. Install Dependencies
+
+### 2. vertual environment
+```bash
+python -m venv .venv
+
+# for linux/mac
+source .venv/bin/activate
+
+# OR for windows
+.\.venv\Scripts\activate
+```
+
+### 3. Install Dependencies
 ```bash
 pip install -r requirements.txt
 ```
-### 3. Setup .ENV file
+
+### 4. Setup .ENV file
 ```bash
 GOOGLE_API_KEY = your_gemini_api_key_here
 ```
-### 4. Run The Application
+ 
+### 5. Run The Application
 ```bash
 streamlit run app.py
 ```
+
+### 6. Run the Application (New)
+```bash
+uvicorn server:app --reload
+```
+
 ## 🔐 Note
 
 - Make sure your `.env` file is not pushed to GitHub  
